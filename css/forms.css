@@ -5,7 +5,7 @@ input[type=text],input[type=email],input[type=password],input[type=number],input
   padding:12px 13px;font-size:.94rem;width:100%;outline:none;
   transition:border-color 160ms var(--ease-out)}
 input:focus{border-color:#5b6cff}
-input::placeholder{color:#6b76a3}
+input::placeholder{color:var(--placeholder,#939bc7)}
 .check{display:flex!important;align-items:center;gap:10px;flex-direction:row!important}
 .check input{width:18px;height:18px;accent-color:#5b6cff}
 .form-error{background:#f8717122;border:1px solid #f8717155;color:#fecaca;

@@ -14,9 +14,9 @@
   <div class="auth-wrap" id="authView">
     <div class="auth-card">
       <div class="auth-brand"><span class="brand-mark">E</span><div><strong>EDUCA</strong><span>Misión GIT · Proyecto Web Educa</span></div></div>
-      <div class="tabs" role="tablist">
-        <button class="tab is-on" id="tabLogin" type="button">Entrar</button>
-        <button class="tab" id="tabRegister" type="button">Crear cuenta</button>
+      <div class="tabs" role="tablist" aria-label="Acceso">
+        <button class="tab is-on" id="tabLogin" type="button" role="tab" aria-selected="true">Entrar</button>
+        <button class="tab" id="tabRegister" type="button" role="tab" aria-selected="false">Crear cuenta</button>
       </div>
       <form id="loginForm" novalidate>
         <label>Email<input type="email" name="email" placeholder="profe@educa.co" required autocomplete="username" /></label>
@@ -54,7 +54,8 @@
       <header class="topbar">
         <h1 id="viewTitle">Panel</h1>
         <div class="top-actions">
-          <input id="searchInput" class="search hidden" type="search" placeholder="Buscar…" aria-label="Buscar estudiantes" />
+          <span class="xp-mini" id="xpMini">0 XP</span>
+          <input id="searchInput" class="search" type="search" placeholder="Buscar…" aria-label="Buscar estudiantes" />
           <span class="user-chip" id="welcomeMsg"></span>
           <button class="btn btn-ghost" id="logoutBtn" type="button">Salir</button>
         </div>
@@ -66,14 +67,14 @@
             <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label">Estudiantes</span></div>
             <div class="stat"><span class="stat-num" id="statActive">0</span><span class="stat-label">Activos</span></div>
             <div class="stat"><span class="stat-num" id="statAvg">-</span><span class="stat-label">Promedio</span></div>
-            <div class="stat"><span class="stat-num" id="statSource">local</span><span class="stat-label">Fuente</span></div>
           </div>
           <div class="card">
             <div class="card-head"><h2>Recientes</h2><button class="mini" data-goto-view="students" type="button">Ver todos</button></div>
             <div class="table-wrap"><table class="table">
               <thead><tr><th>Estudiante</th><th>Curso</th><th>Nota</th><th>Estado</th></tr></thead>
               <tbody id="recentBody"></tbody>
-            </table></div>
+            </table>
+            <p class="muted hidden row-empty" id="recentEmpty">Aún no hay estudiantes. Crea el primero en la vista Estudiantes.</p></div>
           </div>
         </section>
 
@@ -114,7 +115,7 @@ git push -u origin main</code></pre>
 
   <!-- ============ DRAWER (formulario estudiante) ============ -->
   <div class="scrim hidden" id="scrim"></div>
-  <aside class="drawer hidden" id="drawer" aria-label="Formulario de estudiante">
+  <aside class="drawer hidden" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
     <div class="drawer-head"><h2 id="drawerTitle">Nuevo estudiante</h2><button class="mini" id="cancelStudentBtn" type="button">Cerrar</button></div>
     <form id="studentForm" novalidate>
       <input type="hidden" name="id" />
@@ -127,6 +128,8 @@ git push -u origin main</code></pre>
       <button class="btn btn-primary btn-block" type="submit">Guardar</button>
     </form>
   </aside>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
 
   <script src="js/storage.js"></script>
   <script src="js/modules/login.js"></script>

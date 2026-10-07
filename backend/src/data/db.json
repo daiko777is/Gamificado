@@ -1,0 +1,7 @@
+{
+  "users": [],
+  "students": [
+    { "id": "s1", "nombre": "Grace Hopper", "email": "grace@educa.co", "curso": "Sistemas 10-B", "nota": 4.8, "activo": true },
+    { "id": "s2", "nombre": "Ada Lovelace", "email": "ada@educa.co", "curso": "Matemáticas 11-A", "nota": 4.5, "activo": true }
+  ]
+}

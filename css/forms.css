@@ -1,0 +1,16 @@
+/* forms.css — solo presentación de formularios (login, registro, estudiantes) */
+.form-card h2, .student-form{font-family:'Sora',system-ui,sans-serif}
+label{display:grid;gap:7px;font-size:.85rem;font-weight:600;color:#cdd6ff;margin:12px 0}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=search]{
+  background:#0b1020;border:1px solid #ffffff26;color:#eef1ff;border-radius:12px;
+  padding:12px 14px;font-size:.95rem;width:100%;outline:none;transition:.15s}
+input:focus{border-color:#5b6cff;box-shadow:0 0 0 3px #5b6cff33}
+input::placeholder{color:#6b76a3}
+.check{display:flex!important;align-items:center;gap:10px;flex-direction:row!important}
+.check input{width:18px;height:18px;accent-color:#5b6cff}
+.form-row{display:flex;gap:10px;margin-top:14px}
+.form-error{background:#f8717122;border:1px solid #f8717155;color:#fecaca;border-radius:10px;padding:10px 12px;font-size:.85rem}
+.student-form{background:#0b102080;border:1px dashed #ffffff2c;border-radius:14px;padding:18px;margin:16px 0;
+  display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.student-form .form-row,.student-form .form-error{grid-column:1/-1}
+@media(max-width:640px){.student-form{grid-template-columns:1fr}}

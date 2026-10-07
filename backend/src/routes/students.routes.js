@@ -1,0 +1,11 @@
+const { Router } = require('express');
+const ctrl = require('../controllers/studentController');
+const { validateStudent } = require('../middleware/validate');
+const { optionalAuth } = require('../middleware/auth');
+const r = Router();
+r.use(optionalAuth);
+r.get('/', ctrl.list);
+r.post('/', validateStudent, ctrl.create);
+r.patch('/:id', ctrl.update);
+r.delete('/:id', ctrl.remove);
+module.exports = r;

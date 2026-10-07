@@ -1,87 +1,125 @@
-/* app.js — Orquestador: conecta módulos con el DOM */
+/* app.js — Orquestador del SISTEMA: auth, vistas, drawer, tabla */
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var XP = 10;
+  var TITLES = { dashboard: 'Panel', students: 'Estudiantes', guide: 'Guía GIT' };
 
   function setXP(v, label) {
-    XP = v; $('xpPill').textContent = v + ' XP'; $('xpFill').style.width = Math.min(100, v) + '%';
+    $('xpPill').textContent = v + ' XP'; $('xpFill').style.width = Math.min(100, v) + '%';
     if (label) $('xpLabel').textContent = label;
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-
-  function renderRows(list) {
-    var body = $('studentsBody');
-    body.innerHTML = list.map(function (s) {
-      return '<tr><td><strong>' + esc(s.nombre) + '</strong><br><span class="muted small">' + esc(s.email) + '</span></td>' +
-        '<td>' + esc(s.curso || '—') + '</td><td>' + esc(s.nota != null && s.nota !== '' ? s.nota : '—') + '</td>' +
-        '<td><span class="badge ' + (s.activo !== false ? 'ok' : 'off') + '">' + (s.activo !== false ? 'Activo' : 'Inactivo') + '</span></td>' +
-        '<td><div class="row-actions"><button class="mini" data-edit="' + esc(s.id) + '">Editar</button>' +
-        '<button class="mini danger" data-del="' + esc(s.id) + '">Borrar</button></div></td></tr>';
-    }).join('');
-    $('emptyMsg').classList.toggle('hidden', list.length > 0);
+  function rowActions(s) {
+    return '<div class="row-actions"><button class="mini" data-edit="' + esc(s.id) + '" type="button">Editar</button>' +
+      '<button class="mini danger" data-del="' + esc(s.id) + '" type="button">Borrar</button></div>';
+  }
+  function rowHTML(s, actions) {
+    return '<tr><td><strong>' + esc(s.nombre) + '</strong><br><span class="muted small">' + esc(s.email) + '</span></td>' +
+      '<td>' + esc(s.curso || '—') + '</td><td>' + esc(s.nota != null && s.nota !== '' ? s.nota : '—') + '</td>' +
+      '<td><span class="badge ' + (s.activo !== false ? 'ok' : 'off') + '">' + (s.activo !== false ? 'Activo' : 'Inactivo') + '</span></td>' +
+      (actions ? '<td>' + rowActions(s) + '</td>' : '') + '</tr>';
   }
 
-  async function paintDashboard() {
+  async function paint() {
     var all = await window.EducaStudents.refresh();
     var q = $('searchInput').value;
-    renderRows(window.EducaStudents.filter(q));
+    var list = window.EducaStudents.filter(q);
+    $('studentsBody').innerHTML = list.map(function (s) { return rowHTML(s, true); }).join('');
+    $('emptyMsg').classList.toggle('hidden', list.length > 0);
+    $('recentBody').innerHTML = all.slice(-5).reverse().map(function (s) { return rowHTML(s, false); }).join('');
     var st = window.EducaStudents.stats();
-    $('statTotal').textContent = st.total; $('statActive').textContent = st.active; $('statAvg').textContent = st.avg;
+    $('statTotal').textContent = st.total; $('statActive').textContent = st.active;
+    $('statAvg').textContent = st.avg;
     $('statSource').textContent = window.EducaStorage.useBackend ? 'API' : 'local';
   }
 
-  function showSession(user) {
-    $('authSection').classList.add('hidden'); $('heroSection').classList.add('hidden');
-    $('dashboard').classList.remove('hidden'); $('logoutBtn').classList.remove('hidden');
-    $('welcomeMsg').textContent = 'Hola, ' + user.name + ' (' + user.email + '). Gestiona tus estudiantes abajo.';
-    setXP(100, 'Fase 3 · Sesión activa — reto completado');
-    paintDashboard();
+  function showView(name) {
+    ['dashboard', 'students', 'guide'].forEach(function (v) {
+      $('view-' + v).classList.toggle('hidden', v !== name);
+    });
+    document.querySelectorAll('.side-link').forEach(function (b) {
+      b.classList.toggle('is-on', b.getAttribute('data-view') === name);
+    });
+    $('viewTitle').textContent = TITLES[name];
+    $('searchInput').classList.toggle('hidden', name !== 'students');
   }
-  function showPublic() {
-    $('authSection').classList.remove('hidden'); $('heroSection').classList.remove('hidden');
-    $('dashboard').classList.add('hidden'); $('logoutBtn').classList.add('hidden');
+
+  function openDrawer(edit) {
+    var f = $('studentForm'); f.reset();
+    $('drawerTitle').textContent = edit ? 'Editar estudiante' : 'Nuevo estudiante';
+    if (edit) {
+      f.id.value = edit.id; f.nombre.value = edit.nombre; f.email.value = edit.email;
+      f.curso.value = edit.curso || ''; f.nota.value = edit.nota != null ? edit.nota : '';
+      f.activo.checked = edit.activo !== false;
+    } else { f.id.value = ''; }
+    $('studentError').classList.add('hidden');
+    $('scrim').classList.remove('hidden');
+    var d = $('drawer'); d.classList.remove('hidden'); d.classList.add('pre-enter');
+    requestAnimationFrame(function () { requestAnimationFrame(function () { d.classList.remove('pre-enter'); }); });
+    setTimeout(function () { f.nombre.focus(); }, 340);
   }
+  function closeDrawer() {
+    var d = $('drawer');
+    d.classList.add('pre-enter'); $('scrim').style.opacity = '0';
+    setTimeout(function () { d.classList.add('hidden'); $('scrim').classList.add('hidden'); $('scrim').style.opacity = ''; }, 320);
+  }
+
+  function showApp(user) {
+    $('authView').classList.add('hidden'); $('appView').classList.remove('hidden');
+    $('welcomeMsg').textContent = user.name + ' · ' + user.email;
+    setXP(100, 'Sesión activa');
+    showView('dashboard'); paint();
+  }
+  function showAuth() { $('authView').classList.remove('hidden'); $('appView').classList.add('hidden'); }
 
   document.addEventListener('DOMContentLoaded', async function () {
     await window.EducaStorage.ping();
     document.addEventListener('educa:backend', function (e) {
-      var dot = $('backendDot');
-      dot.textContent = e.detail ? '● API conectada' : '● local';
-      dot.classList.toggle('on', !!e.detail);
-      if (!$('dashboard').classList.contains('hidden')) paintDashboard();
+      $('backendDot').textContent = e.detail ? '● API conectada' : '● local';
+      if (!$('appView').classList.contains('hidden')) paint();
     });
 
-    document.querySelectorAll('[data-goto]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var t = b.getAttribute('data-goto') === 'login' ? $('loginCard') : $('registerCard');
-        t.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        t.querySelector('input').focus();
-      });
+    $('tabLogin').addEventListener('click', function () {
+      $('tabLogin').classList.add('is-on'); $('tabRegister').classList.remove('is-on');
+      $('loginForm').classList.remove('hidden'); $('registerForm').classList.add('hidden');
     });
-    $('navDocsBtn').addEventListener('click', function () { $('gitGuide').scrollIntoView({ behavior: 'smooth' }); });
+    $('tabRegister').addEventListener('click', function () {
+      $('tabRegister').classList.add('is-on'); $('tabLogin').classList.remove('is-on');
+      $('registerForm').classList.remove('hidden'); $('loginForm').classList.add('hidden');
+    });
 
     var sess = window.EducaStorage.session();
-    if (sess) showSession(sess); else setXP(20, 'Fase 1 · Análisis en docs/ANALISIS.md — regístrate para continuar');
+    if (sess) showApp(sess); else setXP(20, 'Análisis en docs/ANALISIS.md');
 
     $('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       var u = await window.EducaLogin.handleLogin(e.target, $('loginError'));
-      if (u) { e.target.reset(); setXP(60, 'Fase 2 · Nivel 3 — login funcional'); showSession(u); }
+      if (u) { e.target.reset(); setXP(60, 'Login funcional'); showApp(u); }
     });
     $('registerForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       var u = await window.EducaRegister.handleRegister(e.target, $('registerError'));
-      if (u) { e.target.reset(); setXP(75, 'Fase 2 · Nivel 3 — registro funcional'); showSession(u); }
+      if (u) { e.target.reset(); setXP(75, 'Registro funcional'); showApp(u); }
     });
-    $('logoutBtn').addEventListener('click', function () { window.EducaStorage.logout(); showPublic(); });
+    $('logoutBtn').addEventListener('click', function () { window.EducaStorage.logout(); showAuth(); });
 
-    $('newStudentBtn').addEventListener('click', function () {
-      var f = $('studentForm'); f.reset(); f.id.value = ''; f.classList.remove('hidden'); f.nombre.focus();
+    document.querySelectorAll('[data-view]').forEach(function (b) {
+      b.addEventListener('click', function () { showView(b.getAttribute('data-view')); });
     });
-    $('cancelStudentBtn').addEventListener('click', function () { $('studentForm').classList.add('hidden'); });
+    document.querySelectorAll('[data-goto-view]').forEach(function (b) {
+      b.addEventListener('click', function () { showView(b.getAttribute('data-goto-view')); });
+    });
+
+    $('newStudentBtn').addEventListener('click', function () { openDrawer(null); });
+    $('cancelStudentBtn').addEventListener('click', closeDrawer);
+    $('scrim').addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !$('drawer').classList.contains('hidden')) closeDrawer();
+    });
     $('searchInput').addEventListener('input', async function () {
-      renderRows(window.EducaStudents.filter($('searchInput').value));
+      var list = window.EducaStudents.filter($('searchInput').value);
+      $('studentsBody').innerHTML = list.map(function (s) { return rowHTML(s, true); }).join('');
+      $('emptyMsg').classList.toggle('hidden', list.length > 0);
     });
 
     $('studentForm').addEventListener('submit', async function (e) {
@@ -96,22 +134,16 @@
       if (data.nombre.length < 2) { err.textContent = 'El nombre es obligatorio.'; err.classList.remove('hidden'); return; }
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) { err.textContent = 'Email inválido.'; err.classList.remove('hidden'); return; }
       await window.EducaStorage.saveStudent(data);
-      f.reset(); f.classList.add('hidden');
-      setXP(90, 'Fase 2 · Nivel 4 — CRUD de estudiantes + ramas + merge');
-      paintDashboard();
+      closeDrawer(); setXP(90, 'CRUD + ramas + merge'); paint();
     });
 
     $('studentsBody').addEventListener('click', async function (e) {
       var ed = e.target.getAttribute('data-edit'), del = e.target.getAttribute('data-del');
       if (ed) {
         var s = window.EducaStudents.cache.find(function (x) { return String(x.id) === String(ed); });
-        if (!s) return;
-        var f = $('studentForm');
-        f.id.value = s.id; f.nombre.value = s.nombre; f.email.value = s.email;
-        f.curso.value = s.curso || ''; f.nota.value = s.nota != null ? s.nota : ''; f.activo.checked = s.activo !== false;
-        f.classList.remove('hidden'); f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (s) { showView('students'); openDrawer(s); }
       }
-      if (del && confirm('¿Borrar este estudiante?')) { await window.EducaStorage.deleteStudent(del); paintDashboard(); }
+      if (del && confirm('¿Borrar este estudiante?')) { await window.EducaStorage.deleteStudent(del); paint(); }
     });
   });
 })();

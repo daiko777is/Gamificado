@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Educa · Misión GIT — Proyecto Web Educa</title>
-  <meta name="description" content="Aplicación web sencilla para gestionar estudiantes. Reto gamificado: Misión GIT." />
+  <title>Educa · Sistema de gestión de estudiantes</title>
+  <meta name="description" content="Sistema Educa: login, registro y gestión de estudiantes. Misión GIT." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -12,156 +12,124 @@
   <link rel="stylesheet" href="css/forms.css" />
 </head>
 <body>
-  <div class="bg-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
 
-  <header class="topbar">
-    <div class="wrap topbar-inner">
-      <a class="brand" href="#">
-        <span class="brand-mark">E</span>
-        <span class="brand-text">EDUCA <em>Misión GIT</em></span>
-      </a>
-      <nav class="topnav">
-        <span class="xp-pill" id="xpPill" title="Puntos del reto">0 XP</span>
-        <span class="backend-dot" id="backendDot" title="Estado del backend">● local</span>
-        <button class="btn btn-ghost" id="navDocsBtn" type="button">Guía GIT</button>
-        <button class="btn btn-ghost hidden" id="logoutBtn" type="button">Salir</button>
-      </nav>
-    </div>
-  </header>
-
-  <main class="wrap">
-    <!-- HERO -->
-    <section class="hero" id="heroSection">
-      <div class="hero-copy">
-        <p class="kicker">RETO GAMIFICADO INTEGRADOR · 100 XP</p>
-        <h1>Misión GIT:<br />Proyecto Web <span class="hl">Educa</span></h1>
-        <p class="lede">Gestión básica de estudiantes con control de versiones real. Sin base de datos: los datos viven en <code>localStorage</code>… y ahora también en el <strong>backend Educa API</strong>.</p>
-        <div class="hero-actions">
-          <button class="btn btn-primary" data-goto="register" type="button">Empezar misión</button>
-          <button class="btn btn-ghost" data-goto="login" type="button">Ya tengo cuenta</button>
-        </div>
-        <div class="xp-bar" aria-label="Progreso del reto">
-          <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:10%"></div></div>
-          <small id="xpLabel">Fase 1 · Análisis completado en docs/ANALISIS.md</small>
-        </div>
+  <!-- ============ AUTH (sin sesión) ============ -->
+  <div class="auth-wrap" id="authView">
+    <div class="auth-card">
+      <div class="auth-brand"><span class="brand-mark">E</span><div><strong>EDUCA</strong><span>Misión GIT · Proyecto Web Educa</span></div></div>
+      <div class="tabs" role="tablist">
+        <button class="tab is-on" id="tabLogin" type="button">Entrar</button>
+        <button class="tab" id="tabRegister" type="button">Crear cuenta</button>
       </div>
-      <div class="hero-card">
-        <div class="hero-card-head">
-          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          <span class="hero-card-title">app.js → storage.js → Educa API</span>
-        </div>
-<pre class="hero-code"><code>Usuario → Ingresa datos → Sistema valida → Acceso permitido
-   │            │               │
-   ▼            ▼               ▼
-register.js  storage.js    backend/src/services
-   │         localStorage         │
-   └────────▶ students.js ◀──────┘</code></pre>
-        <ul class="hero-list">
-          <li><strong>3</strong> funcionalidades mínimas</li>
-          <li><strong>4</strong> commits · <strong>2</strong> ramas + merge</li>
-          <li><strong>0</strong> pérdidas con Git</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- AUTH -->
-    <section class="grid-2" id="authSection">
-      <div class="card form-card" id="loginCard">
-        <h2>Iniciar sesión</h2>
-        <p class="muted">Valida credenciales contra <code>storage.js</code> (local o API).</p>
-        <form id="loginForm" novalidate>
-          <label>Email<input type="email" name="email" placeholder="profe@educa.co" required autocomplete="username" /></label>
-          <label>Contraseña<input type="password" name="password" placeholder="••••••••" required autocomplete="current-password" /></label>
-          <p class="form-error hidden" id="loginError"></p>
-          <button class="btn btn-primary btn-block" type="submit">Entrar</button>
-          <p class="muted small">Demo: regístrate primero, o usa <code>demo@educa.co / demo1234</code>.</p>
-        </form>
-      </div>
-
-      <div class="card form-card" id="registerCard">
-        <h2>Registro de usuarios</h2>
-        <p class="muted">Guarda con <code>storage.js → localStorage / POST /api/auth/register</code>.</p>
-        <form id="registerForm" novalidate>
-          <label>Nombre completo<input type="text" name="name" placeholder="Ada Lovelace" required autocomplete="name" /></label>
-          <label>Email<input type="email" name="email" placeholder="ada@educa.co" required autocomplete="email" /></label>
-          <label>Contraseña (mín. 6)<input type="password" name="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" /></label>
-          <p class="form-error hidden" id="registerError"></p>
-          <button class="btn btn-accent btn-block" type="submit">Crear cuenta</button>
-        </form>
-      </div>
-    </section>
-
-    <!-- DASHBOARD -->
-    <section class="card hidden" id="dashboard">
-      <div class="dash-head">
-        <div>
-          <h2>Panel de estudiantes</h2>
-          <p class="muted" id="welcomeMsg">Gestión básica de estudiantes.</p>
-        </div>
-        <div class="dash-actions">
-          <input id="searchInput" class="search" type="search" placeholder="Buscar por nombre o email…" aria-label="Buscar estudiantes" />
-          <button class="btn btn-primary" id="newStudentBtn" type="button">+ Estudiante</button>
-        </div>
-      </div>
-
-      <div class="stats">
-        <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label">Estudiantes</span></div>
-        <div class="stat"><span class="stat-num" id="statActive">0</span><span class="stat-label">Activos</span></div>
-        <div class="stat"><span class="stat-num" id="statAvg">—</span><span class="stat-label">Promedio</span></div>
-        <div class="stat"><span class="stat-num" id="statSource">local</span><span class="stat-label">Fuente de datos</span></div>
-      </div>
-
-      <form id="studentForm" class="student-form hidden" novalidate>
-        <input type="hidden" name="id" />
-        <label>Nombre*<input type="text" name="nombre" placeholder="Ej: Grace Hopper" required /></label>
-        <label>Email*<input type="email" name="email" placeholder="grace@educa.co" required /></label>
-        <label>Curso<input type="text" name="curso" placeholder="Ej: 10-B / Sistemas" /></label>
-        <label>Nota (0–5)<input type="number" name="nota" min="0" max="5" step="0.1" placeholder="4.2" /></label>
-        <label class="check"><input type="checkbox" name="activo" checked /> Activo</label>
-        <div class="form-row">
-          <button class="btn btn-primary" type="submit">Guardar</button>
-          <button class="btn btn-ghost" type="button" id="cancelStudentBtn">Cancelar</button>
-        </div>
-        <p class="form-error hidden" id="studentError"></p>
+      <form id="loginForm" novalidate>
+        <label>Email<input type="email" name="email" placeholder="profe@educa.co" required autocomplete="username" /></label>
+        <label>Contraseña<input type="password" name="password" placeholder="••••••••" required autocomplete="current-password" /></label>
+        <p class="form-error hidden" id="loginError"></p>
+        <button class="btn btn-primary btn-block" type="submit">Entrar al sistema</button>
+        <p class="muted small">Demo: <code>demo@educa.co / demo1234</code> (se crea sola si no existe).</p>
       </form>
+      <form id="registerForm" class="hidden" novalidate>
+        <label>Nombre completo<input type="text" name="name" placeholder="Ada Lovelace" required autocomplete="name" /></label>
+        <label>Email<input type="email" name="email" placeholder="ada@educa.co" required autocomplete="email" /></label>
+        <label>Contraseña (mín. 6)<input type="password" name="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" /></label>
+        <p class="form-error hidden" id="registerError"></p>
+        <button class="btn btn-accent btn-block" type="submit">Crear cuenta</button>
+      </form>
+    </div>
+  </div>
 
-      <div class="table-wrap">
-        <table class="table" id="studentsTable">
-          <thead><tr><th>Estudiante</th><th>Curso</th><th>Nota</th><th>Estado</th><th></th></tr></thead>
-          <tbody id="studentsBody"></tbody>
-        </table>
-        <p class="muted hidden" id="emptyMsg">Sin estudiantes todavía. Agrega el primero con “+ Estudiante”.</p>
+  <!-- ============ APP (con sesión) ============ -->
+  <div class="app hidden" id="appView">
+    <aside class="side">
+      <div class="side-brand"><span class="brand-mark">E</span><div><strong>EDUCA</strong><span id="backendDot">● local</span></div></div>
+      <nav class="side-nav">
+        <button class="side-link is-on" data-view="dashboard" type="button">Panel</button>
+        <button class="side-link" data-view="students" type="button">Estudiantes</button>
+        <button class="side-link" data-view="guide" type="button">Guía GIT</button>
+      </nav>
+      <div class="side-foot">
+        <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:10%"></div></div>
+        <small><span id="xpPill">0 XP</span> · <span id="xpLabel">Misión en curso</span></small>
       </div>
-      <p class="muted small">Abre DevTools → Application → Local Storage para la captura de <code>localStorage</code> que pide la entrega.</p>
-    </section>
+    </aside>
 
-    <!-- GIT HELP -->
-    <section class="card docs" id="gitGuide">
-      <h2>Guía rápida GIT (para tus capturas)</h2>
+    <div class="main">
+      <header class="topbar">
+        <h1 id="viewTitle">Panel</h1>
+        <div class="top-actions">
+          <input id="searchInput" class="search hidden" type="search" placeholder="Buscar…" aria-label="Buscar estudiantes" />
+          <span class="user-chip" id="welcomeMsg"></span>
+          <button class="btn btn-ghost" id="logoutBtn" type="button">Salir</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section id="view-dashboard">
+          <div class="stats">
+            <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label">Estudiantes</span></div>
+            <div class="stat"><span class="stat-num" id="statActive">0</span><span class="stat-label">Activos</span></div>
+            <div class="stat"><span class="stat-num" id="statAvg">—</span><span class="stat-label">Promedio</span></div>
+            <div class="stat"><span class="stat-num" id="statSource">local</span><span class="stat-label">Fuente</span></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Recientes</h2><button class="mini" data-goto-view="students" type="button">Ver todos</button></div>
+            <div class="table-wrap"><table class="table">
+              <thead><tr><th>Estudiante</th><th>Curso</th><th>Nota</th><th>Estado</th></tr></thead>
+              <tbody id="recentBody"></tbody>
+            </table></div>
+          </div>
+        </section>
+
+        <section id="view-students" class="hidden">
+          <div class="card">
+            <div class="card-head">
+              <h2>Estudiantes</h2>
+              <button class="btn btn-primary" id="newStudentBtn" type="button">+ Estudiante</button>
+            </div>
+            <div class="table-wrap"><table class="table" id="studentsTable">
+              <thead><tr><th>Estudiante</th><th>Curso</th><th>Nota</th><th>Estado</th><th></th></tr></thead>
+              <tbody id="studentsBody"></tbody>
+            </table>
+            <p class="muted hidden" id="emptyMsg">Sin estudiantes todavía. Agrega el primero con “+ Estudiante”.</p></div>
+            <p class="muted small">Captura de entrega: F12 → Application → Local Storage → <code>educa_estudiantes</code>.</p>
+          </div>
+        </section>
+
+        <section id="view-guide" class="hidden">
+          <div class="card docs">
+            <h2>Guía GIT del reto</h2>
 <pre><code>git --version
 git config --global user.name "Tu Nombre"
 git config --global user.email "tu@correo.com"
 
-git init proyecto-educa
-# Commit 1: base → Commit 2: login → Commit 3: registro → Commit 4: estudiantes
-git add . &amp;&amp; git commit -m "feat: estructura base del sistema Educa"
-
-git checkout -b login      # rama login
-git checkout -b registro   # rama registro
+git checkout -b login     # funcionalidad aislada
+git checkout -b registro  # sin romper main
 git checkout main &amp;&amp; git merge login &amp;&amp; git merge registro
 
 git remote add origin https://github.com/daiko777is/Gamificado.git
 git push -u origin main</code></pre>
-      <p class="muted small">Detalle completo en <code>docs/GUIA-GIT.md</code> · Análisis en <code>docs/ANALISIS.md</code> · Reflexión en <code>docs/REFLEXION.md</code>.</p>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="wrap footer-inner">
-      <span>EDUCA · Misión GIT — HTML + CSS + JS + localStorage + Educa API</span>
-      <span class="muted">Fase 1: 20 XP · Fase 2: 50 XP · Fase 3: 30 XP</span>
+            <p class="muted small">Completo en <code>docs/GUIA-GIT.md</code> · Análisis en <code>docs/ANALISIS.md</code> · Reflexión en <code>docs/REFLEXION.md</code>.</p>
+          </div>
+        </section>
+      </main>
     </div>
-  </footer>
+  </div>
+
+  <!-- ============ DRAWER (formulario estudiante) ============ -->
+  <div class="scrim hidden" id="scrim"></div>
+  <aside class="drawer hidden" id="drawer" aria-label="Formulario de estudiante">
+    <div class="drawer-head"><h2 id="drawerTitle">Nuevo estudiante</h2><button class="mini" id="cancelStudentBtn" type="button">Cerrar</button></div>
+    <form id="studentForm" novalidate>
+      <input type="hidden" name="id" />
+      <label>Nombre*<input type="text" name="nombre" placeholder="Ej: Grace Hopper" required /></label>
+      <label>Email*<input type="email" name="email" placeholder="grace@educa.co" required /></label>
+      <label>Curso<input type="text" name="curso" placeholder="Ej: 10-B / Sistemas" /></label>
+      <label>Nota (0–5)<input type="number" name="nota" min="0" max="5" step="0.1" placeholder="4.2" /></label>
+      <label class="check"><input type="checkbox" name="activo" checked /> Activo</label>
+      <p class="form-error hidden" id="studentError"></p>
+      <button class="btn btn-primary btn-block" type="submit">Guardar</button>
+    </form>
+  </aside>
 
   <script src="js/storage.js"></script>
   <script src="js/modules/login.js"></script>

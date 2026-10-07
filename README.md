@@ -5,7 +5,7 @@ Reto gamificado integrador (100 XP): análisis, Git por ramas y reflexión profe
 
 Repo remoto: **https://github.com/daiko777is/Gamificado**
 
-## Stack
+## Stack Usado
 
 | Capa | Tecnología |
 |---|---|

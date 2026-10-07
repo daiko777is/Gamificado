@@ -15,7 +15,7 @@
   }
   function rowHTML(s, actions) {
     return '<tr><td><strong>' + esc(s.nombre) + '</strong><br><span class="muted small">' + esc(s.email) + '</span></td>' +
-      '<td>' + esc(s.curso || '—') + '</td><td>' + esc(s.nota != null && s.nota !== '' ? s.nota : '—') + '</td>' +
+      '<td>' + esc(s.curso || '-') + '</td><td>' + esc(s.nota != null && s.nota !== '' ? s.nota : '-') + '</td>' +
       '<td><span class="badge ' + (s.activo !== false ? 'ok' : 'off') + '">' + (s.activo !== false ? 'Activo' : 'Inactivo') + '</span></td>' +
       (actions ? '<td>' + rowActions(s) + '</td>' : '') + '</tr>';
   }

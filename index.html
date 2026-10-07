@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Educa · Sistema de gestión de estudiantes</title>
   <meta name="description" content="Sistema Educa: login, registro y gestión de estudiantes. Misión GIT." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="css/forms.css" />
 </head>
@@ -33,7 +30,7 @@
         <label>Email<input type="email" name="email" placeholder="ada@educa.co" required autocomplete="email" /></label>
         <label>Contraseña (mín. 6)<input type="password" name="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" /></label>
         <p class="form-error hidden" id="registerError"></p>
-        <button class="btn btn-accent btn-block" type="submit">Crear cuenta</button>
+        <button class="btn btn-primary btn-block" type="submit">Crear cuenta</button>
       </form>
     </div>
   </div>
@@ -68,7 +65,7 @@
           <div class="stats">
             <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label">Estudiantes</span></div>
             <div class="stat"><span class="stat-num" id="statActive">0</span><span class="stat-label">Activos</span></div>
-            <div class="stat"><span class="stat-num" id="statAvg">—</span><span class="stat-label">Promedio</span></div>
+            <div class="stat"><span class="stat-num" id="statAvg">-</span><span class="stat-label">Promedio</span></div>
             <div class="stat"><span class="stat-num" id="statSource">local</span><span class="stat-label">Fuente</span></div>
           </div>
           <div class="card">
@@ -124,7 +121,7 @@ git push -u origin main</code></pre>
       <label>Nombre*<input type="text" name="nombre" placeholder="Ej: Grace Hopper" required /></label>
       <label>Email*<input type="email" name="email" placeholder="grace@educa.co" required /></label>
       <label>Curso<input type="text" name="curso" placeholder="Ej: 10-B / Sistemas" /></label>
-      <label>Nota (0–5)<input type="number" name="nota" min="0" max="5" step="0.1" placeholder="4.2" /></label>
+      <label>Nota (0-5)<input type="number" name="nota" min="0" max="5" step="0.1" placeholder="4.2" /></label>
       <label class="check"><input type="checkbox" name="activo" checked /> Activo</label>
       <p class="form-error hidden" id="studentError"></p>
       <button class="btn btn-primary btn-block" type="submit">Guardar</button>

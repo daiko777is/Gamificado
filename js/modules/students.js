@@ -14,7 +14,7 @@
     var total = cache.length;
     var active = cache.filter(function (s) { return s.activo !== false; }).length;
     var notas = cache.map(function (s) { return Number(s.nota); }).filter(function (n) { return !isNaN(n); });
-    var avg = notas.length ? (notas.reduce(function (a, b) { return a + b; }, 0) / notas.length).toFixed(1) : '—';
+    var avg = notas.length ? (notas.reduce(function (a, b) { return a + b; }, 0) / notas.length).toFixed(1) : '-';
     return { total: total, active: active, avg: avg };
   }
   global.EducaStudents = { refresh: refresh, filter: filter, stats: stats, get cache() { return cache; } };

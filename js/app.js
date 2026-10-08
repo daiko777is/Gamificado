@@ -22,7 +22,12 @@
 
   function setXP(v, label) {
     $('xpPill').textContent = v + ' XP'; $('xpMini').textContent = v + ' XP';
-    $('xpFill').style.transform = 'scaleX(' + Math.min(100, v) / 100 + ')';
+    // La barra siempre ocupa el 100% del track y se escala desde la izquierda:
+    // así el ancho inline/CSS ya no limita el progreso (antes quedaba atascada en ~10%).
+    var fill = $('xpFill');
+    fill.style.width = '100%';
+    fill.style.transformOrigin = 'left center';
+    fill.style.transform = 'scaleX(' + Math.max(0, Math.min(100, v)) / 100 + ')';
     if (label) $('xpLabel').textContent = label;
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -227,6 +232,10 @@
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) { err.textContent = 'Email inválido. Revisa el formato (ej: nombre@educa.co).'; err.classList.remove('hidden'); return; }
       withLoading(f, 'Guardando…', function () { return window.EducaStorage.saveStudent(data); }).then(function () {
         closeDrawer(); setXP(90, 'CRUD + ramas + merge'); paint(); toast('Estudiante guardado');
+      }).catch(function (e) {
+        // Email duplicado (409 / local), validación (400), sesión, red caída…
+        err.textContent = (e && e.message) || 'No se pudo guardar el estudiante. Intenta de nuevo.';
+        err.classList.remove('hidden');
       });
     });
 
@@ -239,7 +248,12 @@
       if (del) {
         if (deleteArmed === del) {
           clearTimeout(deleteTimer); deleteArmed = null;
-          await window.EducaStorage.deleteStudent(del); paint(); toast('Estudiante eliminado');
+          try {
+            await window.EducaStorage.deleteStudent(del);
+            paint(); toast('Estudiante eliminado');
+          } catch (e) {
+            paint(); toast((e && e.message) || 'No se pudo eliminar el estudiante.');
+          }
         } else {
           deleteArmed = del; paint();
           toast('Toca Borrar otra vez para confirmar');

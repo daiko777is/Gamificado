@@ -110,7 +110,17 @@
     });
 
     var sess = window.EducaStorage.session();
-    if (sess) showApp(sess); else setXP(20, 'Análisis en docs/ANALISIS.md');
+    document.addEventListener('educa:expired', function () {
+      showAuth(); setXP(20, 'Sesión expirada'); toast('Sesión expirada. Entra de nuevo.');
+    });
+    if (sess && window.EducaStorage.useBackend && window.EducaStorage.hasToken()) {
+      window.EducaStorage.verify().then(function (me) {
+        if (me) showApp({ name: me.email.split('@')[0], email: me.email, id: me.id });
+        else showAuth();
+      });
+    } else if (sess && window.EducaStorage.useBackend) {
+      showAuth(); toast('Vuelve a entrar para conectar con el servidor');
+    } else if (sess) showApp(sess); else setXP(20, 'Análisis en docs/ANALISIS.md');
 
     $('loginForm').addEventListener('submit', function (e) {
       e.preventDefault();

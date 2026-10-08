@@ -14,6 +14,11 @@
   <div class="auth-wrap" id="authView">
     <div class="auth-card">
       <div class="auth-brand"><span class="brand-mark">E</span><div><strong>EDUCA</strong><span>Misión GIT · Proyecto Web Educa</span></div></div>
+      <ol class="mission">
+        <li class="done">Análisis en docs</li>
+        <li>Ramas + merge</li>
+        <li>Entrega 100 XP</li>
+      </ol>
       <div class="tabs" role="tablist" aria-label="Acceso">
         <button class="tab is-on" id="tabLogin" type="button" role="tab" aria-selected="true">Entrar</button>
         <button class="tab" id="tabRegister" type="button" role="tab" aria-selected="false">Crear cuenta</button>
@@ -83,6 +88,11 @@
             <div class="card-head">
               <h2>Estudiantes</h2>
               <button class="btn btn-primary" id="newStudentBtn" type="button">+ Estudiante</button>
+            </div>
+            <div class="chips" role="group" aria-label="Filtrar por estado">
+              <button class="chip is-on" data-filter="all" type="button" aria-pressed="true">Todos</button>
+              <button class="chip" data-filter="active" type="button" aria-pressed="false">Activos</button>
+              <button class="chip" data-filter="inactive" type="button" aria-pressed="false">Inactivos</button>
             </div>
             <div class="table-wrap"><table class="table" id="studentsTable">
               <thead><tr><th>Estudiante</th><th>Curso</th><th>Nota</th><th>Estado</th><th></th></tr></thead>

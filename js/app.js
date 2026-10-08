@@ -4,6 +4,8 @@
   var $ = function (id) { return document.getElementById(id); };
   var TITLES = { dashboard: 'Panel', students: 'Estudiantes', guide: 'Guía GIT' };
   var currentView = 'dashboard';
+  var statusFilter = 'all';
+  var firstPaint = true;
   var deleteArmed = null, deleteTimer = null;
 
   function toast(msg) {
@@ -24,29 +26,59 @@
     if (label) $('xpLabel').textContent = label;
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function notaCell(s) {
+    if (s.nota == null || s.nota === '') return '<td>-</td>';
+    var n = Number(s.nota);
+    var c = n >= 4 ? 'n-ok' : (n >= 3 ? 'n-mid' : 'n-low');
+    return '<td><span class="nota ' + c + '">' + esc(s.nota) + '</span></td>';
+  }
   function rowHTML(s, actions) {
     return '<tr><td><strong>' + esc(s.nombre) + '</strong><br><span class="muted small">' + esc(s.email) + '</span></td>' +
-      '<td>' + esc(s.curso || '-') + '</td><td>' + esc(s.nota != null && s.nota !== '' ? s.nota : '-') + '</td>' +
+      '<td>' + esc(s.curso || '-') + '</td>' + notaCell(s) +
       '<td><span class="badge ' + (s.activo !== false ? 'ok' : 'off') + '">' + (s.activo !== false ? 'Activo' : 'Inactivo') + '</span></td>' +
       (actions ? '<td><div class="row-actions"><button class="mini" data-edit="' + esc(s.id) + '" type="button">Editar</button>' +
       '<button class="mini danger" data-del="' + esc(s.id) + '" type="button">' + (deleteArmed === String(s.id) ? 'Confirmar' : 'Borrar') + '</button></div></td>' : '') + '</tr>';
   }
 
-  async function paint() {
-    var all = await window.EducaStudents.refresh();
+  function applyFilters() {
     var list = window.EducaStudents.filter($('searchInput').value);
+    if (statusFilter !== 'all') {
+      list = list.filter(function (s) {
+        return statusFilter === 'active' ? s.activo !== false : s.activo === false;
+      });
+    }
+    return list;
+  }
+  function skeleton(rows, cols) {
+    var h = '';
+    for (var i = 0; i < rows; i++) { h += '<tr class="loading"><td colspan="' + cols + '"><span class="skel"></span></td></tr>'; }
+    return h;
+  }
+
+  async function paint() {
+    $('studentsBody').innerHTML = skeleton(3, 5);
+    var all = await window.EducaStudents.refresh();
+    var list = applyFilters();
     $('studentsBody').innerHTML = list.map(function (s) { return rowHTML(s, true); }).join('');
     $('emptyMsg').classList.toggle('hidden', list.length > 0);
     $('recentBody').innerHTML = all.slice(-5).reverse().map(function (s) { return rowHTML(s, false); }).join('');
     $('recentEmpty').classList.toggle('hidden', all.length > 0);
     var st = window.EducaStudents.stats();
     $('statTotal').textContent = st.total; $('statActive').textContent = st.active; $('statAvg').textContent = st.avg;
+    if (firstPaint) {
+      firstPaint = false;
+      document.querySelector('.stats').classList.add('first');
+    }
   }
 
   function showView(name) {
     currentView = name;
     ['dashboard', 'students', 'guide'].forEach(function (v) {
-      $('view-' + v).classList.toggle('hidden', v !== name);
+      var el = $('view-' + v);
+      el.classList.toggle('hidden', v !== name);
+      if (v === name) {
+        el.classList.remove('view-enter'); void el.offsetWidth; el.classList.add('view-enter');
+      }
     });
     document.querySelectorAll('.side-link').forEach(function (b) {
       b.classList.toggle('is-on', b.getAttribute('data-view') === name);
@@ -147,6 +179,19 @@
       b.addEventListener('click', function () { showView(b.getAttribute('data-goto-view')); });
     });
 
+    document.querySelectorAll('.chip').forEach(function (c) {
+      c.addEventListener('click', function () {
+        statusFilter = c.getAttribute('data-filter');
+        document.querySelectorAll('.chip').forEach(function (x) {
+          var on = x === c;
+          x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        var list = applyFilters();
+        $('studentsBody').innerHTML = list.map(function (s) { return rowHTML(s, true); }).join('');
+        $('emptyMsg').classList.toggle('hidden', list.length > 0);
+      });
+    });
+
     $('newStudentBtn').addEventListener('click', function () { openDrawer(null); });
     $('cancelStudentBtn').addEventListener('click', closeDrawer);
     $('scrim').addEventListener('click', closeDrawer);
@@ -164,7 +209,7 @@
     });
     $('searchInput').addEventListener('input', async function () {
       if (currentView !== 'students') showView('students');
-      var list = window.EducaStudents.filter($('searchInput').value);
+      var list = applyFilters();
       $('studentsBody').innerHTML = list.map(function (s) { return rowHTML(s, true); }).join('');
       $('emptyMsg').classList.toggle('hidden', list.length > 0);
     });

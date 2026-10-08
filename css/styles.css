@@ -138,3 +138,41 @@ code{background:var(--hover);padding:.1em .4em;border-radius:6px;font-size:.9em;
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:0ms!important;transition-duration:0ms!important}
 }
+
+/* ---------- Mission steps (auth: real reto phases, not decoration) ---------- */
+.mission{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 16px;padding:0}
+.mission li{border:1px solid var(--line);border-radius:10px;padding:8px 6px;font-size:.72rem;color:var(--muted);text-align:center}
+.mission li.done{color:var(--ok);border-color:#34d39944}
+
+/* ---------- Filter chips ---------- */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;
+  min-height:36px;padding:6px 14px;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;
+  transition:background 160ms var(--ease-out),color 160ms var(--ease-out),border-color 160ms var(--ease-out),transform 160ms var(--ease-out)}
+.chip.is-on{background:var(--accent-dim);color:var(--ink);border-color:var(--accent-line)}
+.chip:active{transform:scale(0.97)}
+
+/* ---------- Nota badges (semantic performance state) ---------- */
+.nota{display:inline-block;min-width:44px;text-align:center;padding:4px 10px;border-radius:999px;
+  font-weight:700;font-variant-numeric:tabular-nums}
+.n-ok{background:#34d39922;color:var(--ok)}
+.n-mid{background:var(--hover);color:var(--ink)}
+.n-low{background:var(--danger-dim);color:var(--danger-ink)}
+
+/* ---------- Table hover (scanning aid) ---------- */
+.table tbody tr:hover td{background:#ffffff08}
+
+/* ---------- Skeleton (loading shape matches final rows) ---------- */
+.skel{display:block;height:14px;border-radius:6px;background:var(--hover)}
+
+/* ---------- View transition (one state-change moment per switch) ---------- */
+.view-enter{animation:viewIn 160ms var(--ease-out)}
+@keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- First-paint stagger (dashboard stats, once) ---------- */
+.stats.first .stat{opacity:0;animation:rise 220ms var(--ease-out) forwards}
+.stats.first .stat:nth-child(2){animation-delay:40ms}
+.stats.first .stat:nth-child(3){animation-delay:80ms}
+
+/* ---------- Scrim: blur focuses the foreground form ---------- */
+.scrim{backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}

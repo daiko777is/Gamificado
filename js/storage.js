@@ -15,6 +15,8 @@
   var LS_STUDENTS = 'educa_estudiantes';
   var LS_SESSION = 'educa_sesion';
   var LS_TOKEN = 'educa_token';
+  var DEMO_EMAIL = 'demo@educa.co';
+  var DEMO_PASS = 'demo1234';
   var backendOk = false;
 
   function normEmail(e) { return String(e || '').trim().toLowerCase(); }
@@ -107,12 +109,23 @@
     },
     async login(payload) {
       var email = normEmail(payload.email);
-      return viaBackend(function () {
+      var isDemo = email === DEMO_EMAIL && payload.password === DEMO_PASS;
+      function loginApi() {
         return api('/auth/login', { method: 'POST', body: JSON.stringify({ email: email, password: payload.password }) })
           .then(function (r) {
             if (r.token) localStorage.setItem(LS_TOKEN, r.token);
             writeLS(LS_SESSION, r.user); return r.user;
           });
+      }
+      return viaBackend(function () {
+        // El demo "se crea sola si no existe": con backend, db.json no trae usuarios,
+        // así que si el login del demo es rechazado lo registramos y reintentamos.
+        return loginApi().catch(function (e) {
+          if (!isDemo || e.network) throw e;
+          return api('/auth/register', { method: 'POST', body: JSON.stringify({ name: 'Demo Profe', email: DEMO_EMAIL, password: DEMO_PASS }) })
+            .then(loginApi)
+            .catch(function () { throw e; }); // si no se pudo crear (p. ej. ya existe con otra clave), mostramos el error original
+        });
       }, function () {
         var users = readLS(LS_USERS, []);
         var u = users.find(function (x) { return normEmail(x.email) === email && x.pass === payload.password; });
